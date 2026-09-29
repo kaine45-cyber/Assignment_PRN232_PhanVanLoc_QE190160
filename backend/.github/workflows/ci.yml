@@ -1,0 +1,19 @@
+name: Backend CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore
+        run: dotnet restore StudentID_ClassCode_Ass1_BE.sln
+      - name: Build
+        run: dotnet build StudentID_ClassCode_Ass1_BE.sln --configuration Release --no-restore
