@@ -1,0 +1,45 @@
+erDiagram
+    direction LR
+    Department ||--o{ Project : "owns"
+    Project ||--o{ Task : "contains"
+    Task ||--o{ TaskTag : "is tagged"
+    Tag ||--o{ TaskTag : "labels"
+
+    Department {
+        serial DepartmentID PK
+        varchar(100) DepartmentName "NOT NULL"
+        varchar(300) DepartmentDescription "NOT NULL"
+        boolean IsActive "DEFAULT TRUE"
+    }
+    Project {
+        serial ProjectID PK
+        varchar(200) ProjectName "NOT NULL"
+        text Description
+        date StartDate "NOT NULL"
+        date EndDate
+        smallint Status "0 NotStarted 1 InProgress 2 Completed 3 OnHold"
+        int DepartmentID FK
+        boolean IsActive "DEFAULT TRUE"
+        timestamp CreatedDate "DEFAULT now"
+    }
+    Task {
+        serial TaskID PK
+        varchar(300) Title "NOT NULL"
+        text Description
+        smallint Status "0 ToDo 1 InProgress 2 Done 3 Cancelled"
+        smallint Priority "0 Low 1 Medium 2 High 3 Critical"
+        date DueDate
+        int ProjectID FK
+        boolean IsActive "soft delete flag"
+        timestamp CreatedDate "DEFAULT now"
+        timestamp ModifiedDate
+    }
+    Tag {
+        serial TagID PK
+        varchar(50) TagName UK
+        varchar(7) Color "hex e.g. #3B82F6"
+    }
+    TaskTag {
+        int TaskID PK,FK
+        int TagID PK,FK
+    }

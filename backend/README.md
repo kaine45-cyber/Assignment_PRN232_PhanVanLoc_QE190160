@@ -33,6 +33,7 @@ RESTful API built with **ASP.NET Core 8**, **Entity Framework Core 8** (Database
 - [CI/CD](#cicd)
 - [Deployment](#deployment)
 - [Implementation notes](#implementation-notes)
+- [Assignment bonus features](#assignment-bonus-features)
 - [Known limitations](#known-limitations)
 - [Author](#author)
 
@@ -59,6 +60,11 @@ QE190160_SE19B_Ass1_BE.sln
 **Dependency flow:** `API → Service → Repo`. Controllers never reference the `DbContext`, and all database access goes through repositories. Services and repositories are registered in one place, `AddTaskTrackServices()`.
 
 ## Data model
+
+![Entity Relationship Diagram](docs/erd.png)
+
+<details>
+<summary>Mermaid source (also in <code>docs/erd.mmd</code>)</summary>
 
 ```mermaid
 erDiagram
@@ -106,6 +112,8 @@ erDiagram
         int TagID PK,FK
     }
 ```
+
+</details>
 
 | Enum | Values |
 |---|---|
@@ -289,6 +297,14 @@ flowchart LR
 - **Timestamps.** The `timestamp without time zone` columns use Npgsql's legacy timestamp behaviour, so `DateTime.Now` is stored as-is.
 - **Delete guards count every linked row**, including soft-deleted tasks, because the foreign keys would block the delete anyway.
 - **Swagger in production.** Swagger is intentionally enabled in Production so that the live API documentation stays reachable.
+
+## Assignment bonus features
+
+| Bonus item (Assignment 1) | Where |
+|---|---|
+| Status filter on the task list page | Frontend `/tasks` (status tabs with counts) and `/tasks/manage` |
+| GitHub Actions CI on every push | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) — restore, build, publish, Docker build; plus GHCR push & Render deploy on `main` (frontend repo has lint, type-check, build & Vercel deploy) |
+| ERD diagram image in the README | [`docs/erd.png`](docs/erd.png) (see [Data model](#data-model)) |
 
 ## Known limitations
 
