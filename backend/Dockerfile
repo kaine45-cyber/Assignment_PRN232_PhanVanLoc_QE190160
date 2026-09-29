@@ -3,7 +3,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Restore first (better layer caching)
-COPY StudentID_ClassCode_Ass1_BE.sln ./
 COPY TaskTrack.API/TaskTrack.API.csproj TaskTrack.API/
 COPY TaskTrack.Service/TaskTrack.Service.csproj TaskTrack.Service/
 COPY TaskTrack.Repo/TaskTrack.Repo.csproj TaskTrack.Repo/
