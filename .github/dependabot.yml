@@ -5,6 +5,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Stay on the versions required by the assignment (.NET 8, Next.js 15); only take minor/patch updates.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       microsoft:
         patterns: ["Microsoft.*", "Npgsql*"]
@@ -14,6 +18,10 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Stay on the versions required by the assignment (.NET 8, Next.js 15); only take minor/patch updates.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: ["minor", "patch"]
