@@ -1,23 +1,27 @@
 import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { Toaster } from "sonner";
-import Navbar from "@/components/Navbar";
+import AppShell from "@/components/layout/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "TaskTrack", template: "%s · TaskTrack" },
-  description: "Task & Team Management — PRN232 Assignment 1",
+  description: "Task & team management — PRN232 Assignment 1",
 };
+
+// Applies the saved (or system) theme before first paint to avoid a flash.
+const themeScript = `try{var t=localStorage.getItem('theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d)}catch(e){}`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className="min-h-screen antialiased">
-        <Navbar />
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">{children}</main>
-        <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-          TaskTrack · PRN232 Assignment 1
-        </footer>
-        <Toaster richColors position="top-right" closeButton />
+    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body>
+        <AppShell>{children}</AppShell>
+        <Toaster position="bottom-right" richColors closeButton theme="system" />
       </body>
     </html>
   );

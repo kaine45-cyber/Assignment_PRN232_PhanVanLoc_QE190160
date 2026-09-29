@@ -114,6 +114,22 @@ export const tagsApi = {
   remove: (id: number) => request<void>(`/tags/${id}`, { method: "DELETE" }),
 };
 
+/** Pings the backend health endpoint (outside /api). Used by the sidebar status indicator. */
+export async function checkHealth(timeoutMs = 60000): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${API_BASE}/health`, { cache: "no-store", signal: controller.signal });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export const API_URL = API_BASE;
+
 export function errorMessage(err: unknown): string {
   if (err instanceof ApiError) return err.message;
   if (err instanceof Error) return err.message;
