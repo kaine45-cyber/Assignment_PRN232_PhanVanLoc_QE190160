@@ -4,7 +4,7 @@
 
 **PRN232 · Assignment 1: Task & Team Management (Frontend)**
 
-The web client for TaskTrack, built with **Next.js 15 (App Router)**, **React 19**, **TypeScript** and **Tailwind CSS 4**. Every page loads real data from the TaskTrack API.
+The web client for TaskTrack — a dashboard-style app built with **Next.js 15 (App Router)**, **React 19**, **TypeScript** and **Tailwind CSS 4**. Every page loads real data from the TaskTrack API.
 
 [![CI/CD](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160_FE/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160_FE/actions/workflows/ci-cd.yml)
 ![Next.js 15](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
@@ -24,15 +24,30 @@ The web client for TaskTrack, built with **Next.js 15 (App Router)**, **React 19
 
 ## Contents
 
+- [Screenshots](#screenshots)
 - [Pages](#pages)
 - [UI & UX](#ui--ux)
+- [Data model](#data-model)
 - [Project structure](#project-structure)
 - [Running locally](#running-locally)
 - [Scripts](#scripts)
 - [Environment variables](#environment-variables)
 - [CI/CD](#cicd)
 - [Deployment](#deployment)
+- [Assignment bonus features](#assignment-bonus-features)
 - [Author](#author)
+
+## Screenshots
+
+| Dashboard (light) | Dashboard (dark) |
+|---|---|
+| ![Dashboard – light](docs/screenshots/dashboard-light.webp) | ![Dashboard – dark](docs/screenshots/dashboard-dark.webp) |
+| **Project detail – Kanban board** | **Task management** |
+| ![Project board](docs/screenshots/project-board.webp) | ![Task management](docs/screenshots/tasks-manage.webp) |
+| **Search with live filters** | **Create task modal (dark)** |
+| ![Search](docs/screenshots/search.webp) | ![Task modal](docs/screenshots/task-modal-dark.webp) |
+
+<p align="center"><img src="docs/screenshots/mobile.webp" alt="Mobile layout" width="260" /></p>
 
 ## Pages
 
@@ -40,53 +55,66 @@ The web client for TaskTrack, built with **Next.js 15 (App Router)**, **React 19
 
 | Route | Description |
 |---|---|
-| `/` | Welcome banner, summary counts (departments, projects, tasks) and active projects as cards |
-| `/departments` | Active departments, with a name search |
-| `/departments/[id]` | Department information and its projects |
+| `/` | Dashboard: welcome banner, KPI cards (departments, projects, tasks, overdue), completion meter, *tasks by status / priority* charts, per-project progress, overdue list and active projects as cards |
+| `/departments` | Active departments as cards, with a live name search |
+| `/departments/[id]` | Department info, project / task counts and its projects |
 | `/projects` | Active projects, filterable by name, status and department |
-| `/projects/[id]` | Project details, completion progress and a task list with status and priority badges, tags and due dates |
-| `/tasks` | Task list with a status filter |
-| `/tasks/[id]` | Every field of a single task, including its tags |
-| `/search` | Filter tasks by title, status, priority, project and tag. Results update live, and the filters are kept in the URL |
+| `/projects/[id]` | Project details, progress, stats and its tasks as a **sortable table or a Kanban board** (status badge, priority badge, tags, due date) |
+| `/tasks` | Every active task with a **status filter** (tabs with counts), priority and title filters, sorting and pagination |
+| `/tasks/[id]` | All fields of a task including tags, with an overdue warning |
+| `/search` | Filter tasks by title, status, priority, project and tag. Results update as filters change and are synced to the URL (shareable) |
 
 ### Management (public CRUD)
 
 | Route | Features |
 |---|---|
-| `/departments/manage` | Table with create and edit in a modal, and delete with confirmation |
-| `/projects/manage` | Table with create and edit in a modal (date-range validation), and delete with confirmation |
-| `/tasks/manage` | Table with create and edit in a modal, **tag multi-select**, **soft delete** with confirmation, and a status filter |
-| `/tags/manage` | Table with a color picker, preset colors, a live preview, and delete with confirmation |
+| `/departments/manage` | Sortable table, create / edit in a modal, delete with confirmation, active/inactive filter |
+| `/projects/manage` | Sortable table, create / edit in a modal (date-range validation), delete with confirmation, status & department filters |
+| `/tasks/manage` | Sortable table, create / edit in a modal with **tag multi-select**, **soft delete** with confirmation, status tabs. `?new=1&projectId=` deep link opens the create form |
+| `/tags/manage` | Sortable table, color picker with presets and live preview, delete with confirmation |
 
 ## UI & UX
 
-- **Badges.** Status and priority appear as colored badges. Overdue tasks are highlighted in red.
-- **Loading states.** Pages show skeletons and spinners while data loads, and a message explains the backend's cold start.
-- **Toasts.** A toast notification ([Sonner](https://sonner.emilkowal.ski/)) confirms the result of every create, update and delete.
-- **Confirmation dialogs.** Built on [Radix UI Dialog](https://www.radix-ui.com/), so they are accessible and keyboard friendly.
-- **Validation.** Forms are validated on the client with React Hook Form and Zod. Field errors returned by the API are shown under the matching input.
-- **Responsive layout.** Desktop pages use tables, mobile pages use cards, and the navbar collapses into a hamburger menu.
+- **App shell** — fixed sidebar navigation (drawer on mobile), top bar with global task search (press <kbd>/</kbd>), quick "New task" action and a live **API status** indicator (the Render instance may be asleep).
+- **Light & dark theme** — design tokens as CSS variables, toggle in the top bar, remembers the choice and follows the OS by default.
+- **Badges, not numbers** — status badges carry an icon + label, priority badges a 4-step signal indicator, so meaning never relies on colour alone.
+- **Data tables** — generic `DataTable` with sortable columns, pagination and empty states; switches to compact cards on small screens.
+- **Charts** — lightweight, dependency-free bar lists and meters built from a validated data-viz palette.
+- **Feedback** — skeleton loaders and spinners during requests, [Sonner](https://sonner.emilkowal.ski/) toasts after every create / update / delete (including API `400` messages such as *"still has projects linked"*).
+- **Dialogs** — [Radix UI](https://www.radix-ui.com/) modals and confirmation dialogs (focus-trapped, <kbd>Esc</kbd> to close).
+- **Validation** — React Hook Form + Zod on the client; field errors returned by the API are shown under the matching input.
+- **Responsive** — tested at 375 px, 390 px and 1440 px with no horizontal scrolling.
+
+## Data model
+
+![Entity Relationship Diagram](docs/erd.png)
 
 ## Project structure
 
 ```
 .
-├── app/                      App Router routes
-│   ├── page.tsx              Home
-│   ├── departments/          List, [id] detail, manage
-│   ├── projects/             List, [id] detail, manage
-│   ├── tasks/                List, [id] detail, manage
-│   ├── tags/manage/          Tag management
-│   ├── search/               Task search
-│   └── layout.tsx            Navbar, footer, toaster
-├── components/               Badges, Modal, ConfirmDialog, TagMultiSelect, TaskList, ProjectCard, feedback states
-└── lib/
-    ├── api.ts                Typed API client (single source of truth for endpoints, error parsing)
-    ├── types.ts              DTO types shared with the backend contract
-    ├── constants.ts          Status / priority labels and badge colors
-    ├── useFetch.ts           Data-fetching hook (loading / error / reload) and useDebounce
-    ├── forms.ts              Maps server validation errors onto form fields
-    └── utils.ts              Date formatting, overdue detection, class helpers
+├── app/                        App Router routes
+│   ├── page.tsx                Dashboard
+│   ├── departments/            List, [id] detail, manage
+│   ├── projects/               List, [id] detail (table / board), manage
+│   ├── tasks/                  List (status filter), [id] detail, manage
+│   ├── tags/manage/            Tag management
+│   ├── search/                 Task search
+│   └── layout.tsx              Fonts, theme bootstrap, app shell, toaster
+├── components/
+│   ├── layout/                 AppShell, Sidebar, Topbar, ThemeToggle, ApiStatus
+│   ├── ui/                     DataTable, Modal, ConfirmDialog, Card, StatCard, BarList, Meter, Segmented, FormField, feedback states
+│   ├── forms/                  DepartmentForm, ProjectForm, TaskForm, TagForm (React Hook Form + Zod)
+│   └── *.tsx                   Badges, ProjectCard, TaskBoard, TaskColumns, TagMultiSelect, DepartmentAvatar
+├── lib/
+│   ├── api.ts                  Typed API client (endpoints, error parsing, health check)
+│   ├── types.ts                DTO types matching the backend contract
+│   ├── constants.ts            Status / priority labels and badge colours
+│   ├── useFetch.ts             Data-fetching hook (loading / error / reload) + useDebounce
+│   ├── useCrudDialogs.ts       Shared create / edit / delete dialog state for management pages
+│   ├── forms.ts                Maps server validation errors onto form fields
+│   └── utils.ts                Dates, overdue detection, percentages, helpers
+└── docs/                       ERD and screenshots used in this README
 ```
 
 ## Running locally
@@ -152,6 +180,14 @@ The app is deployed on **Vercel**:
 3. Deploy, then add the Vercel domain to the backend's `CORS_ORIGINS`.
 
 Deployments can also be run from GitHub Actions once the `VERCEL_*` secrets are set. See [CI/CD](#cicd).
+
+## Assignment bonus features
+
+| Bonus item (Assignment 1) | Where |
+|---|---|
+| Status filter on the task list page | [`app/tasks/page.tsx`](app/tasks/page.tsx) — status tabs with live counts (also on `/tasks/manage`) |
+| GitHub Actions CI on every push | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) — ESLint, TypeScript type-check, production build; Vercel deploy on `main` |
+| ERD diagram image in the README | [`docs/erd.png`](docs/erd.png) (see [Data model](#data-model)) |
 
 ## Author
 
