@@ -1,0 +1,14 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.swp
+TestResults/
+publish/
+
+## Secrets
+.env
+appsettings.Local.json
