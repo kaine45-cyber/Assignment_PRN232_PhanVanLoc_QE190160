@@ -1,11 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Building2 } from "lucide-react";
-import PageHeader from "@/components/PageHeader";
+import { FolderKanban, ListTodo } from "lucide-react";
+import PageHeader from "@/components/ui/PageHeader";
 import ProjectCard from "@/components/ProjectCard";
+import DepartmentAvatar from "@/components/DepartmentAvatar";
 import { ActiveBadge } from "@/components/Badges";
-import { EmptyState, ErrorState, PageLoader } from "@/components/Feedback";
+import { EmptyState, ErrorState, PageLoader } from "@/components/ui/Feedback";
+import StatCard from "@/components/ui/StatCard";
 import { departmentsApi } from "@/lib/api";
 import { useFetch } from "@/lib/useFetch";
 
@@ -16,33 +18,38 @@ export default function DepartmentDetailPage() {
   if (loading) return <PageLoader />;
   if (error || !data) return <ErrorState message={error ?? "Department not found."} onRetry={reload} />;
 
+  const taskCount = data.projects.reduce((s, p) => s + p.taskCount, 0);
+
   return (
     <div>
       <PageHeader
         breadcrumbs={[{ label: "Departments", href: "/departments" }, { label: data.departmentName }]}
         title={
           <span className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
-              <Building2 className="h-5 w-5" />
-            </span>
+            <DepartmentAvatar id={data.departmentId} name={data.departmentName} size="lg" />
             {data.departmentName}
           </span>
         }
-        description={data.departmentDescription}
+        description={<span className="mt-2 block max-w-2xl">{data.departmentDescription}</span>}
         actions={<ActiveBadge active={data.isActive} />}
       />
 
-      <h2 className="mb-4 text-lg font-semibold text-slate-900">
-        Projects <span className="text-slate-400">({data.projects.length})</span>
-      </h2>
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:max-w-xl">
+        <StatCard label="Active projects" value={data.projects.length} icon={FolderKanban} />
+        <StatCard label="Active tasks" value={taskCount} icon={ListTodo} />
+      </div>
+
+      <h2 className="mb-4 text-base font-semibold text-fg">Projects</h2>
       {data.projects.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {data.projects.map((p) => (
             <ProjectCard key={p.projectId} project={p} showDepartment={false} />
           ))}
         </div>
       ) : (
-        <EmptyState title="This department has no active projects" />
+        <div className="card">
+          <EmptyState title="No active projects" description="This department has no active projects yet." />
+        </div>
       )}
     </div>
   );
