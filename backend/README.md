@@ -6,7 +6,7 @@
 
 RESTful API built with **ASP.NET Core 8**, **Entity Framework Core 8** (Database-First) and **PostgreSQL**, using a clean three-layer architecture.
 
-[![CI/CD](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160/actions/workflows/ci-cd.yml)
+[![CI/CD](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160/actions/workflows/backend.yml/badge.svg)](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160/actions/workflows/backend.yml)
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
@@ -16,7 +16,7 @@ RESTful API built with **ASP.NET Core 8**, **Entity Framework Core 8** (Database
 | | |
 |---|---|
 | **Live API (Swagger)** | `https://<your-service>.onrender.com/swagger` |
-| **Frontend repository** | [Assignment_PRN232_PhanVanLoc_QE190160_FE](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160_FE) |
+| **Frontend (same repository)** | [`frontend/`](../frontend) |
 | **Frontend (live)** | `https://<your-app>.vercel.app` |
 
 > The API runs on Render's free tier and sleeps when idle, so the first request can take up to about a minute.
@@ -245,7 +245,7 @@ The Dockerfile uses a multi-stage build: the .NET 8 SDK image builds the app, an
 
 ## CI/CD
 
-The pipeline is defined in `.github/workflows/ci-cd.yml` and runs on GitHub Actions.
+The pipeline is defined in [`.github/workflows/backend.yml`](../.github/workflows/backend.yml) at the repository root. It only runs when files under `backend/` change.
 
 ```mermaid
 flowchart LR
@@ -275,7 +275,7 @@ flowchart LR
 2. Connect with the *External Database URL* and run `database/TaskManagementDB_Postgres.sql`.
 
 **API: Render Web Service**
-1. Create the service: **New → Web Service**, select this repository, and set **Runtime** to **Docker**.
+1. Create the service: **New → Web Service**, select this repository, set **Root Directory** to `backend` and **Runtime** to **Docker**.
 2. Set the environment variables:
    - `DATABASE_URL`: the *Internal Database URL*
    - `ASPNETCORE_ENVIRONMENT=Production`
@@ -303,7 +303,7 @@ flowchart LR
 | Bonus item (Assignment 1) | Where |
 |---|---|
 | Status filter on the task list page | Frontend `/tasks` (status tabs with counts) and `/tasks/manage` |
-| GitHub Actions CI on every push | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) — restore, build, publish, Docker build; plus GHCR push & Render deploy on `main` (frontend repo has lint, type-check, build & Vercel deploy) |
+| GitHub Actions CI on every push | [`.github/workflows/backend.yml`](../.github/workflows/backend.yml) — restore, build, publish, Docker build; plus GHCR push & Render deploy on `main` (the frontend pipeline runs lint, type-check, build & Vercel deploy) |
 | ERD diagram image in the README | [`docs/erd.png`](docs/erd.png) (see [Data model](#data-model)) |
 
 ## Known limitations

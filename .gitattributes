@@ -1,0 +1,5 @@
+# Normalize line endings (Windows / Linux contributors)
+* text=auto eol=lf
+*.sln text eol=crlf
+*.ico binary
+*.png binary

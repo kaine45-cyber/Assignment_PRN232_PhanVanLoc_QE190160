@@ -6,7 +6,7 @@
 
 The web client for TaskTrack — a dashboard-style app built with **Next.js 15 (App Router)**, **React 19**, **TypeScript** and **Tailwind CSS 4**. Every page loads real data from the TaskTrack API.
 
-[![CI/CD](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160_FE/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160_FE/actions/workflows/ci-cd.yml)
+[![CI/CD](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160/actions/workflows/frontend.yml/badge.svg)](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160/actions/workflows/frontend.yml)
 ![Next.js 15](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
@@ -17,7 +17,7 @@ The web client for TaskTrack — a dashboard-style app built with **Next.js 15 (
 | | |
 |---|---|
 | **Live site** | `https://<your-app>.vercel.app` |
-| **Backend repository** | [Assignment_PRN232_PhanVanLoc_QE190160](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160) |
+| **Backend (same repository)** | [`backend/`](../backend) |
 | **Backend API (Swagger)** | `https://<your-service>.onrender.com/swagger` |
 
 > The backend runs on Render's free tier, so the first request after a period of inactivity can take up to a minute. The UI shows a loading state meanwhile.
@@ -125,7 +125,7 @@ npm install
 npm run dev                    # http://localhost:3000
 ```
 
-The [backend](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE190160) must be running, and it must allow `http://localhost:3000` in its CORS settings. That origin is allowed by default.
+The [backend](../backend) must be running, and it must allow `http://localhost:3000` in its CORS settings. That origin is allowed by default.
 
 ## Scripts
 
@@ -145,7 +145,7 @@ The [backend](https://github.com/kaine45-cyber/Assignment_PRN232_PhanVanLoc_QE19
 
 ## CI/CD
 
-The pipeline is defined in `.github/workflows/ci-cd.yml` and runs on GitHub Actions.
+The pipeline is defined in [`.github/workflows/frontend.yml`](../.github/workflows/frontend.yml) at the repository root. It only runs when files under `frontend/` change.
 
 ```mermaid
 flowchart LR
@@ -175,7 +175,7 @@ flowchart LR
 
 The app is deployed on **Vercel**:
 
-1. Import this repository. Vercel detects Next.js automatically.
+1. Import this repository and set **Root Directory** to `frontend`. Vercel detects Next.js automatically.
 2. Add `NEXT_PUBLIC_API_URL` under Project → Settings → Environment Variables.
 3. Deploy, then add the Vercel domain to the backend's `CORS_ORIGINS`.
 
@@ -186,7 +186,7 @@ Deployments can also be run from GitHub Actions once the `VERCEL_*` secrets are 
 | Bonus item (Assignment 1) | Where |
 |---|---|
 | Status filter on the task list page | [`app/tasks/page.tsx`](app/tasks/page.tsx) — status tabs with live counts (also on `/tasks/manage`) |
-| GitHub Actions CI on every push | [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) — ESLint, TypeScript type-check, production build; Vercel deploy on `main` |
+| GitHub Actions CI on every push | [`.github/workflows/frontend.yml`](../.github/workflows/frontend.yml) — ESLint, TypeScript type-check, production build; Vercel deploy on `main` |
 | ERD diagram image in the README | [`docs/erd.png`](docs/erd.png) (see [Data model](#data-model)) |
 
 ## Author
