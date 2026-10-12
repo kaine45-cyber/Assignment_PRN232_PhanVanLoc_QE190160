@@ -4,6 +4,9 @@ erDiagram
     Project ||--o{ Task : "contains"
     Task ||--o{ TaskTag : "is tagged"
     Tag ||--o{ TaskTag : "labels"
+    SystemAccount |o--o{ Task : "created / updated"
+    SystemAccount |o--o{ Project : "created / updated"
+    SystemAccount ||--o{ RefreshToken : "owns"
 
     Department {
         serial DepartmentID PK
@@ -21,6 +24,8 @@ erDiagram
         int DepartmentID FK
         boolean IsActive "DEFAULT TRUE"
         timestamp CreatedDate "DEFAULT now"
+        int CreatedByID FK "nullable, audit"
+        int UpdatedByID FK "nullable, audit"
     }
     Task {
         serial TaskID PK
@@ -33,6 +38,8 @@ erDiagram
         boolean IsActive "soft delete flag"
         timestamp CreatedDate "DEFAULT now"
         timestamp ModifiedDate
+        int CreatedByID FK "nullable, audit"
+        int UpdatedByID FK "nullable, audit"
     }
     Tag {
         serial TagID PK
@@ -42,4 +49,21 @@ erDiagram
     TaskTag {
         int TaskID PK,FK
         int TagID PK,FK
+    }
+    SystemAccount {
+        serial AccountID PK
+        varchar(100) FullName "NOT NULL"
+        varchar(150) Email UK "stored lower-case"
+        varchar(200) PasswordHash "BCrypt"
+        smallint Role "0 Staff 1 Admin"
+        timestamp CreatedDate "DEFAULT now"
+    }
+    RefreshToken {
+        serial RefreshTokenID PK
+        int AccountID FK
+        varchar(128) TokenHash UK "SHA-256"
+        timestamp ExpiresAt
+        timestamp CreatedAt
+        timestamp RevokedAt "null while active"
+        varchar(128) ReplacedByHash "rotation chain"
     }
