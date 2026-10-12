@@ -3,11 +3,12 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Toaster } from "sonner";
 import AppShell from "@/components/layout/AppShell";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "TaskTrack", template: "%s · TaskTrack" },
-  description: "Task & team management — PRN232 Assignment 1",
+  description: "Task & team management — PRN232 Assignment 2",
 };
 
 // Applies the saved (or system) theme before first paint to avoid a flash.
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <AppShell>{children}</AppShell>
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
         <Toaster position="bottom-right" richColors closeButton theme="system" />
       </body>
     </html>

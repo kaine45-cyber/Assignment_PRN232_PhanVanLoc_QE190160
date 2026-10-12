@@ -11,7 +11,14 @@ import type {
   Task,
   TaskRequest,
   TaskSearchParams,
+  Account,
+  AuthResponse,
+  ChangePasswordRequest,
+  LoginRequest,
+  RegisterRequest,
+  UpdateAccountRequest,
 } from "./types";
+import { clearSession, getAccessToken, getRefreshToken, loginUrl, saveSession } from "./auth";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/+$/, "");
 
@@ -29,16 +36,68 @@ export class ApiError extends Error {
 
 const toCamel = (key: string) => key.charAt(0).toLowerCase() + key.slice(1);
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+/** Auth endpoints handle their own 401s (wrong password, invalid refresh token…). */
+const AUTH_PATHS = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"];
+
+let refreshing: Promise<boolean> | null = null;
+
+/** Exchanges the refresh token for a new token pair. Single-flight: concurrent 401s share one refresh. */
+export function refreshSession(): Promise<boolean> {
+  if (refreshing) return refreshing;
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return Promise.resolve(false);
+  refreshing = (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+        cache: "no-store",
+      });
+      if (!res.ok) return false;
+      saveSession((await res.json()) as AuthResponse);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setTimeout(() => (refreshing = null), 0);
+    }
+  })();
+  return refreshing;
+}
+
+/** Session is over (expired / revoked): clear it and send the user to /login. */
+function endSession(reason: "expired" | "required") {
+  const target = loginUrl(reason);
+  clearSession(reason === "expired" ? "expired" : null);
+  if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+    window.location.assign(target);
+  }
+}
+
+async function request<T>(path: string, init?: RequestInit, retried = false): Promise<T> {
+  const token = getAccessToken();
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/api${path}`, {
       ...init,
-      headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+      headers: {
+        "Content-Type": "application/json",
+        // Every request carries the JWT when the user is logged in (required for POST/PUT/DELETE).
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(init?.headers ?? {}),
+      },
       cache: "no-store",
     });
   } catch {
     throw new ApiError(0, "Cannot reach the server. It may be waking up — please try again in a moment.");
+  }
+
+  // 401 on a protected endpoint → try one silent refresh, then redirect to /login.
+  if (res.status === 401 && !AUTH_PATHS.some((p) => path.startsWith(p))) {
+    if (token && !retried && (await refreshSession())) return request<T>(path, init, true);
+    endSession(token ? "expired" : "required");
+    throw new ApiError(401, token ? "Your session has expired. Please log in again." : "Please log in to continue.");
   }
 
   if (res.status === 204) return undefined as T;
@@ -112,6 +171,23 @@ export const tagsApi = {
   create: (data: TagRequest) => request<Tag>("/tags", { method: "POST", body: json(data) }),
   update: (id: number, data: TagRequest) => request<Tag>(`/tags/${id}`, { method: "PUT", body: json(data) }),
   remove: (id: number) => request<void>(`/tags/${id}`, { method: "DELETE" }),
+};
+
+export const authApi = {
+  register: (data: RegisterRequest) => request<Account>("/auth/register", { method: "POST", body: json(data) }),
+  login: (data: LoginRequest) => request<AuthResponse>("/auth/login", { method: "POST", body: json(data) }),
+  logout: (refreshToken: string) => request<void>("/auth/logout", { method: "POST", body: json({ refreshToken }) }),
+  me: () => request<Account>("/auth/me"),
+  updateMe: (fullName: string) => request<Account>("/auth/me", { method: "PUT", body: json({ fullName }) }),
+  changePassword: (data: ChangePasswordRequest) => request<void>("/auth/me/password", { method: "PUT", body: json(data) }),
+};
+
+/** Admin-only endpoints. */
+export const accountsApi = {
+  list: () => request<Account[]>("/accounts"),
+  get: (id: number) => request<Account>(`/accounts/${id}`),
+  update: (id: number, data: UpdateAccountRequest) => request<Account>(`/accounts/${id}`, { method: "PUT", body: json(data) }),
+  remove: (id: number) => request<void>(`/accounts/${id}`, { method: "DELETE" }),
 };
 
 /** Pings the backend health endpoint (outside /api). Used by the sidebar status indicator. */

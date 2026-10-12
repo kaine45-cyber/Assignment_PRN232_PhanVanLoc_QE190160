@@ -10,7 +10,7 @@ export interface DepartmentDetail extends Department {
   projects: Project[];
 }
 
-export interface Project {
+export interface Project extends Audit {
   projectId: number;
   projectName: string;
   description: string | null;
@@ -36,7 +36,7 @@ export interface Tag {
   taskCount: number;
 }
 
-export interface Task {
+export interface Task extends Audit {
   taskId: number;
   title: string;
   description: string | null;
@@ -96,4 +96,55 @@ export interface ProjectSearchParams {
   name?: string;
   status?: number | string;
   departmentId?: number | string;
+}
+
+// ---------- Assignment 2: authentication ----------
+export type RoleName = "Admin" | "Staff";
+
+export interface Account {
+  accountId: number;
+  fullName: string;
+  email: string;
+  role: number; // 0 = Staff, 1 = Admin
+  roleName: RoleName;
+  createdDate: string;
+  createdTaskCount: number;
+}
+
+export interface AuthResponse {
+  tokenType: string;
+  accessToken: string;
+  expiresAt: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: string;
+  user: Account;
+}
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UpdateAccountRequest {
+  fullName: string;
+  role: number;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/** Audit fields returned on projects and tasks. */
+export interface Audit {
+  createdById?: number | null;
+  createdByName?: string | null;
+  updatedById?: number | null;
+  updatedByName?: string | null;
 }
