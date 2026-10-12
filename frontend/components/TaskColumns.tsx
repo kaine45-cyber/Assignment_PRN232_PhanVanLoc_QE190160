@@ -5,7 +5,7 @@ import { cn, dueDistance, formatDate, isOverdue } from "@/lib/utils";
 import { PriorityBadge, TagChip, TaskStatusBadge } from "./Badges";
 
 /** Shared column definitions for task tables (read-only + management). */
-export function taskColumns(opts: { showProject?: boolean; showId?: boolean } = {}): Column<Task>[] {
+export function taskColumns(opts: { showProject?: boolean; showId?: boolean; showAudit?: boolean } = {}): Column<Task>[] {
   const cols: Column<Task>[] = [];
   if (opts.showId) {
     cols.push({ key: "id", header: "ID", cell: (t) => <span className="font-mono text-xs text-muted">#{t.taskId}</span>, sortValue: (t) => t.taskId, className: "w-16" });
@@ -61,7 +61,26 @@ export function taskColumns(opts: { showProject?: boolean; showId?: boolean } = 
       },
     },
   );
+  if (opts.showAudit) {
+    cols.push({
+      key: "createdBy",
+      header: "Created by",
+      sortValue: (t) => t.createdByName ?? "",
+      cell: (t) => <AuditCell name={t.createdByName} updatedBy={t.updatedByName} />,
+    });
+  }
   return cols;
+}
+
+/** "Created by" cell with the last editor underneath (audit fields). Seed data has no author. */
+export function AuditCell({ name, updatedBy }: { name?: string | null; updatedBy?: string | null }) {
+  if (!name && !updatedBy) return <span className="text-xs text-muted">Seed data</span>;
+  return (
+    <div className="whitespace-nowrap text-xs">
+      <p className="font-medium text-fg-2">{name ?? "—"}</p>
+      {updatedBy && <p className="text-muted">edited by {updatedBy}</p>}
+    </div>
+  );
 }
 
 /** Compact card used for tasks on small screens. */

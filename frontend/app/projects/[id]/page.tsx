@@ -48,7 +48,7 @@ export default function ProjectDetailPage() {
         }
         title={data.projectName}
         actions={
-          <Link href={`/tasks/manage?new=1&projectId=${data.projectId}`} className="btn btn-primary">
+          <Link href={`/admin/tasks?new=1&projectId=${data.projectId}`} className="btn btn-primary">
             <Plus className="h-4 w-4" /> Add task
           </Link>
         }

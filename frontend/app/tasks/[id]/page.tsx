@@ -49,7 +49,7 @@ export default function TaskDetailPage() {
         }
         title={task.title}
         actions={
-          <Link href="/tasks/manage" className="btn btn-secondary">
+          <Link href="/admin/tasks" className="btn btn-secondary">
             <Pencil className="h-4 w-4" /> Manage tasks
           </Link>
         }
@@ -103,6 +103,8 @@ export default function TaskDetailPage() {
             <Row label="Last modified" icon={RefreshCw}>
               {formatDateTime(task.modifiedDate)}
             </Row>
+            <Row label="Created by">{task.createdByName ?? <span className="text-muted">Seed data</span>}</Row>
+            <Row label="Last edited by">{task.updatedByName ?? "—"}</Row>
           </dl>
         </Card>
       </div>
