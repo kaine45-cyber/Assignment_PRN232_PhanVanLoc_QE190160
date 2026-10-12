@@ -4,9 +4,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, Plus, Search } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import UserMenu from "./UserMenu";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function Topbar({ onMenu }: { onMenu: () => void }) {
   const router = useRouter();
+  const { user } = useAuth();
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -52,12 +55,12 @@ export default function Topbar({ onMenu }: { onMenu: () => void }) {
 
       <div className="ml-auto flex items-center gap-1.5">
         <ThemeToggle />
-        <button type="button" className="btn btn-primary hidden sm:inline-flex" onClick={() => router.push("/tasks/manage?new=1")}>
-          <Plus className="h-4 w-4" /> New task
-        </button>
-        <button type="button" className="btn btn-primary btn-icon sm:hidden" onClick={() => router.push("/tasks/manage?new=1")} aria-label="New task">
-          <Plus className="h-4 w-4" />
-        </button>
+        {user && (
+          <button type="button" className="btn btn-secondary btn-icon hidden sm:inline-flex lg:w-auto lg:px-3" onClick={() => router.push("/admin/tasks?new=1")} aria-label="New task" title="New task">
+            <Plus className="h-4 w-4" /> <span className="hidden lg:inline">New task</span>
+          </button>
+        )}
+        <UserMenu />
       </div>
     </header>
   );

@@ -2,12 +2,19 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Login / register use a focused, centered layout without the app chrome.
+  if (pathname === "/login" || pathname === "/register") {
+    return <div className="min-h-screen">{children}</div>;
+  }
 
   return (
     <div className="min-h-screen">
@@ -35,7 +42,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <Topbar onMenu={() => setMobileOpen(true)} />
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
         <footer className="mx-auto max-w-7xl px-4 pb-8 text-xs text-muted sm:px-6 lg:px-8">
-          TaskTrack · PRN232 Assignment 1 · Phan Văn Lộc (QE190160)
+          TaskTrack · PRN232 Assignment 2 · Phan Văn Lộc (QE190160)
         </footer>
       </div>
     </div>

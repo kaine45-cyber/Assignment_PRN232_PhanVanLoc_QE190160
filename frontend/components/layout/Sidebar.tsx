@@ -13,7 +13,11 @@ import {
   ListChecks,
   Layers,
   ClipboardList,
+  Gauge,
+  LogIn,
+  UserCog,
 } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { cn } from "@/lib/utils";
 import ApiStatus from "./ApiStatus";
 
@@ -28,26 +32,30 @@ const SECTIONS = [
       { href: "/search", label: "Search", icon: Search },
     ],
   },
-  {
-    title: "Management",
-    items: [
-      { href: "/departments/manage", label: "Departments", icon: Settings2 },
-      { href: "/projects/manage", label: "Projects", icon: Layers },
-      { href: "/tasks/manage", label: "Tasks", icon: ClipboardList },
-      { href: "/tags/manage", label: "Tags", icon: Tags },
-    ],
-  },
+];
+
+/** Shown only when logged in (the pages are protected). Accounts is Admin-only. */
+const ADMIN_ITEMS = [
+  { href: "/admin", label: "Admin dashboard", icon: Gauge },
+  { href: "/admin/departments", label: "Departments", icon: Settings2 },
+  { href: "/admin/projects", label: "Projects", icon: Layers },
+  { href: "/admin/tasks", label: "Tasks", icon: ClipboardList },
+  { href: "/admin/tags", label: "Tags", icon: Tags },
+  { href: "/admin/accounts", label: "Accounts", icon: UserCog, adminOnly: true },
 ];
 
 function isActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  if (href.endsWith("/manage")) return pathname === href;
-  // "/projects" is active for "/projects/3" but not for "/projects/manage"
-  return pathname === href || (pathname.startsWith(href + "/") && !pathname.endsWith("/manage"));
+  if (href === "/" || href === "/admin") return pathname === href;
+  return pathname === href || pathname.startsWith(href + "/");
 }
 
 export default function Sidebar({ onNavigate, inDrawer = false }: { onNavigate?: () => void; inDrawer?: boolean }) {
   const pathname = usePathname();
+  const { user, isAdmin, ready } = useAuth();
+  const sections = [
+    ...SECTIONS,
+    ...(user ? [{ title: isAdmin ? "Admin" : "Management", items: ADMIN_ITEMS.filter((i) => !i.adminOnly || isAdmin) }] : []),
+  ];
 
   return (
     <div className="flex h-full flex-col">
@@ -62,7 +70,7 @@ export default function Sidebar({ onNavigate, inDrawer = false }: { onNavigate?:
       </div>
 
       <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4" aria-label="Main">
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <div key={section.title}>
             <p className="mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-wider text-muted">{section.title}</p>
             <ul className="space-y-0.5">
@@ -88,6 +96,15 @@ export default function Sidebar({ onNavigate, inDrawer = false }: { onNavigate?:
             </ul>
           </div>
         ))}
+        {ready && !user && (
+          <div className="rounded-xl border border-dashed border-border p-3 text-sm">
+            <p className="font-medium text-fg">Manage your workspace</p>
+            <p className="mt-0.5 text-xs text-muted">Log in to create, edit and delete data.</p>
+            <Link href="/login" onClick={onNavigate} className="btn btn-primary btn-sm mt-3 w-full">
+              <LogIn className="h-3.5 w-3.5" /> Login
+            </Link>
+          </div>
+        )}
       </nav>
 
       <div className="border-t border-border p-3">
