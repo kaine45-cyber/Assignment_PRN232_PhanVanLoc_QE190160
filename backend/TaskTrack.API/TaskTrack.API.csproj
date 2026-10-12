@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Idempotent SQL migrations, applied at startup by DatabaseMigrator -->
+    <None Include="..\database\migrations\*.sql" Link="database\migrations\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TaskTrack.Service\TaskTrack.Service.csproj" />
   </ItemGroup>
 

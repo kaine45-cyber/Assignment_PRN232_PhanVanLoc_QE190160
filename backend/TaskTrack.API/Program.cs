@@ -83,6 +83,9 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Apply database/migrations/*.sql (idempotent) so the hosted database is upgraded on deploy.
+app.ApplySqlMigrations();
+
 app.UseMiddleware<ExceptionMiddleware>();
 
 // Swagger is enabled in Development AND on Render (Production) because the assignment requires

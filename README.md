@@ -72,6 +72,7 @@ More screenshots are in [`frontend/README.md`](frontend/README.md#screenshots).
 - **Audit fields:** every task and project records who created it and who last updated it.
 - Consistent JSON errors (`400`, `401`, `403`, `404`, `409`) and Swagger / OpenAPI documentation with an **Authorize** button.
 - Integration tests (xUnit + `WebApplicationFactory`) run against a real PostgreSQL database in CI.
+- **Automatic SQL migrations:** on startup the API runs the idempotent scripts in `backend/database/migrations/` (disable with `RUN_MIGRATIONS=false`).
 
 **Frontend (web app)**
 - Public pages: Dashboard, Departments, Department detail, Projects, Project detail (table **or Kanban board**), Tasks (status filter), Task detail and Search.
@@ -225,6 +226,7 @@ The app runs at `http://localhost:3000`. Log in with the Admin account, or creat
 | `DATABASE_URL` | Backend | Overrides the connection string. Render's `postgres://user:pass@host/db` URI is converted automatically |
 | `JWT_SECRET` | Backend | **Required.** Key used to sign JWTs, at least 32 characters (64 random characters recommended). Overrides `Jwt:Secret` |
 | `CORS_ORIGINS` | Backend | Comma-separated list of allowed frontend origins |
+| `RUN_MIGRATIONS` | Backend | `false` turns off the startup migration runner (default: on) |
 | `ASPNETCORE_ENVIRONMENT` | Backend | `Development` locally, `Production` on Render |
 | `NEXT_PUBLIC_API_URL` | Frontend | Base URL of the backend, without a trailing slash and without `/api` |
 
@@ -273,7 +275,7 @@ flowchart LR
 
 1. **New → PostgreSQL** (Free).
    1. Connect with the *External Database URL* (for example from pgAdmin, SSL mode `require`).
-   2. Run `backend/database/TaskManagementDB_Postgres.sql`, then `backend/database/migrations/002_auth.sql`.
+   2. Run `backend/database/TaskManagementDB_Postgres.sql`. The Assignment 2 migration (`backend/database/migrations/002_auth.sql`) is applied automatically when the API starts; you can also run it yourself.
 2. **New → Web Service**. Create it from this repository with these settings:
    - **Root Directory:** `backend`
    - **Runtime:** Docker

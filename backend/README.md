@@ -332,6 +332,7 @@ Open **http://localhost:5000/swagger**.
 | `DATABASE_URL` | Takes precedence over the setting above. Accepts either a `postgres://` URI or a key/value connection string |
 | `JWT_SECRET` | **Required.** JWT signing key, at least 32 characters. Overrides `Jwt:Secret` |
 | `Jwt:AccessTokenMinutes` / `Jwt:RefreshTokenDays` | Token lifetimes (defaults 1440 minutes and 7 days) |
+| `RUN_MIGRATIONS` | `false` disables the startup migration runner (default: on) |
 | `CORS_ORIGINS` | Comma-separated list of allowed origins. It is merged with `Cors:AllowedOrigins` from `appsettings.json` |
 | `ASPNETCORE_ENVIRONMENT` | `Development` or `Production` |
 | `PORT` | The listening port. Render sets it automatically |
@@ -375,7 +376,7 @@ flowchart LR
 
 **Database: Render PostgreSQL**
 1. Create the database: **New → PostgreSQL** (Free).
-2. Connect with the *External Database URL* and run `database/TaskManagementDB_Postgres.sql`, then `database/migrations/002_auth.sql`.
+2. Connect with the *External Database URL* and run `database/TaskManagementDB_Postgres.sql`. `database/migrations/*.sql` is applied by the API itself on startup (`DatabaseMigrator`).
 
 **API: Render Web Service**
 1. Create the service: **New → Web Service**, select this repository, set **Root Directory** to `backend` and **Runtime** to **Docker**.
@@ -401,6 +402,7 @@ flowchart LR
 - **Timestamps.** The `timestamp without time zone` columns use Npgsql's legacy timestamp behaviour, so `DateTime.Now` is stored as-is.
 - **Delete guards count every linked row**, including soft-deleted tasks, because the foreign keys would block the delete anyway.
 - **Swagger in production.** Swagger is intentionally enabled in Production so that the live API documentation stays reachable. It declares the Bearer scheme, so protected endpoints can be tried after clicking **Authorize**.
+- **Startup migrations.** `DatabaseMigrator` runs every file in `database/migrations/` (copied into the build output) inside a transaction when the API starts. The scripts are idempotent, so this is safe on every restart and upgrades the Render database without an external connection.
 - **Emails are normalised** (trimmed, lower-case) before they are stored or compared.
 - **Login failures are indistinguishable.** A wrong email and a wrong password return the same `401` message, so the API does not reveal which emails exist.
 - **Inbound claim mapping is disabled** (`MapInboundClaims = false`), so the token's `role` and `sub` claims are read as-is.
