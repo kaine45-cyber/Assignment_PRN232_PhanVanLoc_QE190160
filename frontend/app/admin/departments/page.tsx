@@ -70,7 +70,7 @@ export default function DepartmentManagePage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Management" }, { label: "Departments" }]}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Departments" }]}
         title="Departments"
         description="Create, edit and delete departments. A department that still has projects cannot be deleted."
         actions={

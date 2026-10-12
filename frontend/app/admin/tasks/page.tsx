@@ -31,7 +31,7 @@ function TaskManageContent() {
   const [status, setStatus] = useState<number | null>(null);
   const [defaultProjectId, setDefaultProjectId] = useState<number | undefined>();
 
-  // Deep link: /tasks/manage?new=1&projectId=3 opens the create modal (used by "New task" buttons).
+  // Deep link: /admin/tasks?new=1&projectId=3 opens the create modal (used by "New task" buttons).
   useEffect(() => {
     if (params.get("new") === "1") {
       const pid = Number(params.get("projectId"));
@@ -60,7 +60,7 @@ function TaskManageContent() {
   );
 
   const columns: Column<Task>[] = [
-    ...taskColumns({ showProject: true, showId: true }),
+    ...taskColumns({ showProject: true, showId: true, showAudit: true }),
     {
       key: "actions",
       header: "",
@@ -71,7 +71,7 @@ function TaskManageContent() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Management" }, { label: "Tasks" }]}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Tasks" }]}
         title="Tasks"
         description="Create, edit and delete tasks. Deleting a task hides it (soft delete) — it is never removed from the database."
         actions={
@@ -117,7 +117,7 @@ function TaskManageContent() {
           rowKey={(t) => t.taskId}
           mobileCard={(t) => <TaskMobileCard task={t} actions={actionsFor(t)} />}
           initialSort={{ key: "id", dir: "asc" }}
-          minWidth={980}
+          minWidth={1100}
           dimmed={loading}
           empty={<EmptyState title="No tasks" description="No tasks match these filters." />}
         />

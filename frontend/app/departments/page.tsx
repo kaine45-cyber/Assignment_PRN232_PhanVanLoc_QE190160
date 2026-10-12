@@ -23,7 +23,7 @@ export default function DepartmentsPage() {
         title="Departments"
         description="All active departments. Select one to see its projects."
         actions={
-          <Link href="/departments/manage" className="btn btn-secondary">
+          <Link href="/admin/departments" className="btn btn-secondary">
             <Settings2 className="h-4 w-4" /> Manage
           </Link>
         }

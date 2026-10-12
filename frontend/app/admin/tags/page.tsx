@@ -65,7 +65,7 @@ export default function TagManagePage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Management" }, { label: "Tags" }]}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Tags" }]}
         title="Tags"
         description="Labels used to categorise tasks. A tag that is used by any task cannot be deleted."
         actions={

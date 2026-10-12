@@ -76,7 +76,7 @@ export default function DashboardPage() {
             <Link href="/search" className="btn btn-secondary">
               <Search className="h-4 w-4" /> Search tasks
             </Link>
-            <Link href="/tasks/manage?new=1" className="btn btn-primary">
+            <Link href="/admin/tasks?new=1" className="btn btn-primary">
               <Plus className="h-4 w-4" /> New task
             </Link>
           </div>

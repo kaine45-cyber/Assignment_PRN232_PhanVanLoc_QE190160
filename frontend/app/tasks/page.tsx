@@ -39,7 +39,7 @@ export default function TasksPage() {
         title="Tasks"
         description="Every active task. Filter by status, priority or title."
         actions={
-          <Link href="/tasks/manage" className="btn btn-secondary">
+          <Link href="/admin/tasks" className="btn btn-secondary">
             <Settings2 className="h-4 w-4" /> Manage
           </Link>
         }

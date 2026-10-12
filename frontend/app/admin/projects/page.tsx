@@ -12,6 +12,7 @@ import { EmptyState, ErrorState, TableSkeleton } from "@/components/ui/Feedback"
 import ProjectForm from "@/components/forms/ProjectForm";
 import DepartmentAvatar from "@/components/DepartmentAvatar";
 import { ActiveBadge, ProjectStatusBadge } from "@/components/Badges";
+import { AuditCell } from "@/components/TaskColumns";
 import { departmentsApi, projectsApi } from "@/lib/api";
 import { PROJECT_STATUS } from "@/lib/constants";
 import type { Project } from "@/lib/types";
@@ -74,6 +75,7 @@ export default function ProjectManagePage() {
     },
     { key: "tasks", header: "Tasks", sortValue: (p) => p.taskCount, align: "right", cell: (p) => <span className="tabular-nums">{p.taskCount}</span> },
     { key: "active", header: "State", sortValue: (p) => (p.isActive ? 1 : 0), cell: (p) => <ActiveBadge active={p.isActive} /> },
+    { key: "createdBy", header: "Created by", sortValue: (p) => p.createdByName ?? "", cell: (p) => <AuditCell name={p.createdByName} updatedBy={p.updatedByName} /> },
     {
       key: "actions",
       header: "",
@@ -94,7 +96,7 @@ export default function ProjectManagePage() {
   return (
     <div>
       <PageHeader
-        breadcrumbs={[{ label: "Management" }, { label: "Projects" }]}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Projects" }]}
         title="Projects"
         description="Create, edit and delete projects. A project that still has tasks cannot be deleted."
         actions={
@@ -164,7 +166,7 @@ export default function ProjectManagePage() {
             </div>
           )}
           initialSort={{ key: "id", dir: "asc" }}
-          minWidth={960}
+          minWidth={1080}
           dimmed={loading}
           empty={<EmptyState title="No projects" description="No projects match these filters." />}
         />

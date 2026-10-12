@@ -29,7 +29,7 @@ export default function ProjectsPage() {
         title="Projects"
         description="Active projects across all departments."
         actions={
-          <Link href="/projects/manage" className="btn btn-secondary">
+          <Link href="/admin/projects" className="btn btn-secondary">
             <Settings2 className="h-4 w-4" /> Manage
           </Link>
         }
