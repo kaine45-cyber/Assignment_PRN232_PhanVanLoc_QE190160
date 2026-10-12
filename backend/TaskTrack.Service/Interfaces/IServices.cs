@@ -18,8 +18,8 @@ public interface IProjectService
     Task<ProjectDetailDto> GetByIdAsync(int id);
     Task<List<ProjectDto>> GetByDepartmentAsync(int departmentId);
     Task<List<ProjectDto>> SearchAsync(string? name, short? status, int? departmentId);
-    Task<ProjectDto> CreateAsync(ProjectRequest request);
-    Task<ProjectDto> UpdateAsync(int id, ProjectRequest request);
+    Task<ProjectDto> CreateAsync(ProjectRequest request, int? actorId = null);
+    Task<ProjectDto> UpdateAsync(int id, ProjectRequest request, int? actorId = null);
     Task DeleteAsync(int id);
 }
 
@@ -29,9 +29,9 @@ public interface ITaskService
     Task<TaskDto> GetByIdAsync(int id);
     Task<List<TaskDto>> GetByProjectAsync(int projectId);
     Task<List<TaskDto>> SearchAsync(string? title, short? status, short? priority, int? projectId, int? tagId);
-    Task<TaskDto> CreateAsync(TaskRequest request);
-    Task<TaskDto> UpdateAsync(int id, TaskRequest request);
-    Task SoftDeleteAsync(int id);
+    Task<TaskDto> CreateAsync(TaskRequest request, int? actorId = null);
+    Task<TaskDto> UpdateAsync(int id, TaskRequest request, int? actorId = null);
+    Task SoftDeleteAsync(int id, int? actorId = null);
 }
 
 public interface ITagService

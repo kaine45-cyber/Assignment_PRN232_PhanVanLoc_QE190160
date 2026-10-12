@@ -49,7 +49,7 @@ public class TaskService : ITaskService
         return list.Select(t => t.ToDto()).ToList();
     }
 
-    public async Task<TaskDto> CreateAsync(TaskRequest request)
+    public async Task<TaskDto> CreateAsync(TaskRequest request, int? actorId = null)
     {
         await EnsureProjectExists(request.ProjectId!.Value);
         var tags = await ResolveTags(request.TagIds);
@@ -63,7 +63,9 @@ public class TaskService : ITaskService
             DueDate = request.DueDate,
             ProjectId = request.ProjectId.Value,
             IsActive = true,
-            CreatedDate = DateTime.Now
+            CreatedDate = DateTime.Now,
+            CreatedById = actorId,
+            UpdatedById = actorId
         };
         foreach (var tag in tags) task.Tags.Add(tag);
 
@@ -72,7 +74,7 @@ public class TaskService : ITaskService
         return await GetByIdAsync(task.TaskId);
     }
 
-    public async Task<TaskDto> UpdateAsync(int id, TaskRequest request)
+    public async Task<TaskDto> UpdateAsync(int id, TaskRequest request, int? actorId = null)
     {
         var task = await _tasks.GetWithDetailsAsync(id);
         if (task == null || !task.IsActive)
@@ -88,6 +90,7 @@ public class TaskService : ITaskService
         task.DueDate = request.DueDate;
         task.ProjectId = request.ProjectId.Value;
         task.ModifiedDate = DateTime.Now;
+        task.UpdatedById = actorId;
 
         // Replace tags: remove all existing TaskTag rows, then add the new set.
         task.Tags.Clear();
@@ -97,7 +100,7 @@ public class TaskService : ITaskService
         return await GetByIdAsync(id);
     }
 
-    public async Task SoftDeleteAsync(int id)
+    public async Task SoftDeleteAsync(int id, int? actorId = null)
     {
         var task = await _tasks.GetWithDetailsAsync(id);
         if (task == null || !task.IsActive)
@@ -105,6 +108,7 @@ public class TaskService : ITaskService
 
         task.IsActive = false;          // soft delete — never hard-delete tasks
         task.ModifiedDate = DateTime.Now;
+        task.UpdatedById = actorId;
         await _tasks.SaveChangesAsync();
     }
 

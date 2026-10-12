@@ -46,7 +46,7 @@ public class ProjectService : IProjectService
         return list.Select(p => p.ToDto()).ToList();
     }
 
-    public async Task<ProjectDto> CreateAsync(ProjectRequest request)
+    public async Task<ProjectDto> CreateAsync(ProjectRequest request, int? actorId = null)
     {
         await EnsureDepartmentExists(request.DepartmentId!.Value);
 
@@ -59,7 +59,9 @@ public class ProjectService : IProjectService
             Status = request.Status,
             DepartmentId = request.DepartmentId.Value,
             IsActive = request.IsActive,
-            CreatedDate = DateTime.Now
+            CreatedDate = DateTime.Now,
+            CreatedById = actorId,
+            UpdatedById = actorId
         };
 
         await _projects.AddAsync(project);
@@ -67,7 +69,7 @@ public class ProjectService : IProjectService
         return (await _projects.GetWithDepartmentAsync(project.ProjectId))!.ToDto();
     }
 
-    public async Task<ProjectDto> UpdateAsync(int id, ProjectRequest request)
+    public async Task<ProjectDto> UpdateAsync(int id, ProjectRequest request, int? actorId = null)
     {
         var project = await _projects.GetByIdAsync(id)
                       ?? throw new NotFoundException($"Project {id} not found.");
@@ -81,6 +83,7 @@ public class ProjectService : IProjectService
         project.Status = request.Status;
         project.DepartmentId = request.DepartmentId.Value;
         project.IsActive = request.IsActive;
+        project.UpdatedById = actorId;
 
         await _projects.SaveChangesAsync();
         return (await _projects.GetWithDepartmentAsync(id))!.ToDto();

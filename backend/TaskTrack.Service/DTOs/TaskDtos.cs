@@ -18,6 +18,12 @@ public class TaskDto
     public DateTime CreatedDate { get; set; }
     public DateTime? ModifiedDate { get; set; }
     public List<TagDto> Tags { get; set; } = new();
+
+    /// <summary>Audit: account that created / last changed the record (null for seed data).</summary>
+    public int? CreatedById { get; set; }
+    public string? CreatedByName { get; set; }
+    public int? UpdatedById { get; set; }
+    public string? UpdatedByName { get; set; }
 }
 
 public class TaskRequest

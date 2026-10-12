@@ -16,6 +16,12 @@ public class ProjectDto
     public bool IsActive { get; set; }
     public DateTime CreatedDate { get; set; }
     public int TaskCount { get; set; }
+
+    /// <summary>Audit: account that created / last changed the record (null for seed data).</summary>
+    public int? CreatedById { get; set; }
+    public string? CreatedByName { get; set; }
+    public int? UpdatedById { get; set; }
+    public string? UpdatedByName { get; set; }
 }
 
 public class ProjectDetailDto : ProjectDto
