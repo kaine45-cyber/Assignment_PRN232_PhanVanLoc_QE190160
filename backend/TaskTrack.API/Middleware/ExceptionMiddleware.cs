@@ -42,7 +42,7 @@ public class ExceptionMiddleware
         var body = new
         {
             status,
-            title = status switch { 400 => "Bad Request", 404 => "Not Found", _ => "Server Error" },
+            title = status switch { 400 => "Bad Request", 401 => "Unauthorized", 403 => "Forbidden", 404 => "Not Found", 409 => "Conflict", _ => "Server Error" },
             message,
             errors
         };
