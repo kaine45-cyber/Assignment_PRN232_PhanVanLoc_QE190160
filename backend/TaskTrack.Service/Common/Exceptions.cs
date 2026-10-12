@@ -28,3 +28,25 @@ public class BadRequestException : AppException
     public static BadRequestException ForField(string field, string message) =>
         new(message, new Dictionary<string, string[]> { [field] = new[] { message } });
 }
+
+/// <summary>409 — the request conflicts with existing data (e.g. duplicate email, account still referenced).</summary>
+public class ConflictException : AppException
+{
+    public ConflictException(string message, IDictionary<string, string[]>? errors = null)
+        : base(409, message, errors) { }
+
+    public static ConflictException ForField(string field, string message) =>
+        new(message, new Dictionary<string, string[]> { [field] = new[] { message } });
+}
+
+/// <summary>401 — invalid credentials or refresh token.</summary>
+public class UnauthorizedException : AppException
+{
+    public UnauthorizedException(string message) : base(401, message) { }
+}
+
+/// <summary>403 — authenticated but not allowed.</summary>
+public class ForbiddenException : AppException
+{
+    public ForbiddenException(string message) : base(403, message) { }
+}

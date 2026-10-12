@@ -42,7 +42,11 @@ public static class DtoMapper
         DepartmentName = departmentName ?? p.Department?.DepartmentName ?? string.Empty,
         IsActive = p.IsActive,
         CreatedDate = p.CreatedDate,
-        TaskCount = p.Tasks.Count(t => t.IsActive)
+        TaskCount = p.Tasks.Count(t => t.IsActive),
+        CreatedById = p.CreatedById,
+        CreatedByName = p.CreatedBy?.FullName,
+        UpdatedById = p.UpdatedById,
+        UpdatedByName = p.UpdatedBy?.FullName
     };
 
     public static ProjectDetailDto ToDetailDto(this Project p)
@@ -61,6 +65,10 @@ public static class DtoMapper
             IsActive = p.IsActive,
             CreatedDate = p.CreatedDate,
             TaskCount = p.Tasks.Count(t => t.IsActive),
+            CreatedById = p.CreatedById,
+            CreatedByName = p.CreatedBy?.FullName,
+            UpdatedById = p.UpdatedById,
+            UpdatedByName = p.UpdatedBy?.FullName,
             Tasks = p.Tasks
                 .Where(t => t.IsActive)
                 .OrderBy(t => t.TaskId)
@@ -85,6 +93,10 @@ public static class DtoMapper
         IsActive = t.IsActive,
         CreatedDate = t.CreatedDate,
         ModifiedDate = t.ModifiedDate,
+        CreatedById = t.CreatedById,
+        CreatedByName = t.CreatedBy?.FullName,
+        UpdatedById = t.UpdatedById,
+        UpdatedByName = t.UpdatedBy?.FullName,
         Tags = t.Tags.OrderBy(g => g.TagName).Select(g => g.ToDto(includeCount: false)).ToList()
     };
 
@@ -94,5 +106,16 @@ public static class DtoMapper
         TagName = g.TagName,
         Color = g.Color,
         TaskCount = includeCount ? g.Tasks.Count(t => t.IsActive) : 0
+    };
+
+    public static AccountDto ToDto(this SystemAccount a, int createdTaskCount) => new()
+    {
+        AccountId = a.AccountId,
+        FullName = a.FullName,
+        Email = a.Email,
+        Role = a.Role,
+        RoleName = Roles.Name(a.Role),
+        CreatedDate = a.CreatedDate,
+        CreatedTaskCount = createdTaskCount
     };
 }

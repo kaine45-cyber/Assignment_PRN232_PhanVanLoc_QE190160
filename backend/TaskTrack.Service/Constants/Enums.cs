@@ -53,3 +53,17 @@ public static class Labels
         _ => "Unknown"
     };
 }
+
+public enum AccountRole : short
+{
+    Staff = 0,
+    Admin = 1
+}
+
+public static class Roles
+{
+    public const string Staff = "Staff";
+    public const string Admin = "Admin";
+
+    public static string Name(short role) => role == (short)AccountRole.Admin ? Admin : Staff;
+}
