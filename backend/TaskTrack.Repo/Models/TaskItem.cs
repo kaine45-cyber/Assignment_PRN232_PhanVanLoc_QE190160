@@ -29,6 +29,14 @@ public partial class TaskItem
 
     public DateTime? ModifiedDate { get; set; }
 
+    public int? CreatedById { get; set; }
+
+    public int? UpdatedById { get; set; }
+
+    public virtual SystemAccount? CreatedBy { get; set; }
+
+    public virtual SystemAccount? UpdatedBy { get; set; }
+
     public virtual Project Project { get; set; } = null!;
 
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();

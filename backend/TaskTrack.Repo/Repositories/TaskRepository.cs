@@ -12,7 +12,9 @@ public class TaskRepository : GenericRepository<TaskItem>, ITaskRepository
         _context.Tasks
             .AsNoTracking()
             .Include(t => t.Project)
-            .Include(t => t.Tags);
+            .Include(t => t.Tags)
+            .Include(t => t.CreatedBy)
+            .Include(t => t.UpdatedBy);
 
     public async Task<List<TaskItem>> GetActiveAsync()
     {
@@ -28,6 +30,8 @@ public class TaskRepository : GenericRepository<TaskItem>, ITaskRepository
         return await _context.Tasks
             .Include(t => t.Project)
             .Include(t => t.Tags)
+            .Include(t => t.CreatedBy)
+            .Include(t => t.UpdatedBy)
             .FirstOrDefaultAsync(t => t.TaskId == id);
     }
 

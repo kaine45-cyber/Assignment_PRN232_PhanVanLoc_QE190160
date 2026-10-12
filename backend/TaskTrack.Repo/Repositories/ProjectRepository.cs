@@ -12,7 +12,9 @@ public class ProjectRepository : GenericRepository<Project>, IProjectRepository
         _context.Projects
             .AsNoTracking()
             .Include(p => p.Department)
-            .Include(p => p.Tasks);
+            .Include(p => p.Tasks)
+            .Include(p => p.CreatedBy)
+            .Include(p => p.UpdatedBy);
 
     public async Task<List<Project>> GetProjectsAsync(bool includeInactive)
     {
@@ -30,6 +32,8 @@ public class ProjectRepository : GenericRepository<Project>, IProjectRepository
         return await _context.Projects
             .AsNoTracking()
             .Include(p => p.Department)
+            .Include(p => p.CreatedBy)
+            .Include(p => p.UpdatedBy)
             .Include(p => p.Tasks)
                 .ThenInclude(t => t.Tags)
             .FirstOrDefaultAsync(p => p.ProjectId == id);

@@ -23,6 +23,14 @@ public partial class Project
 
     public DateTime CreatedDate { get; set; }
 
+    public int? CreatedById { get; set; }
+
+    public int? UpdatedById { get; set; }
+
+    public virtual SystemAccount? CreatedBy { get; set; }
+
+    public virtual SystemAccount? UpdatedBy { get; set; }
+
     public virtual Department Department { get; set; } = null!;
 
     public virtual ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
