@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskTrack.API.Extensions;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 
@@ -17,6 +19,8 @@ public class TagsController : ControllerBase
     public async Task<ActionResult<List<TagDto>>> GetAll()
         => Ok(await _service.GetAllAsync());
 
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost]
     public async Task<ActionResult<TagDto>> Create([FromBody] TagRequest request)
     {
@@ -24,11 +28,15 @@ public class TagsController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, created);
     }
 
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TagDto>> Update(int id, [FromBody] TagRequest request)
         => Ok(await _service.UpdateAsync(id, request));
 
     /// <summary>Delete a tag — returns 400 if it is used by any task.</summary>
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskTrack.API.Extensions;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 
@@ -33,18 +35,24 @@ public class ProjectsController : ControllerBase
         [FromQuery] string? name, [FromQuery] short? status, [FromQuery] int? departmentId)
         => Ok(await _service.SearchAsync(name, status, departmentId));
 
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost]
     public async Task<ActionResult<ProjectDto>> Create([FromBody] ProjectRequest request)
     {
-        var created = await _service.CreateAsync(request);
+        var created = await _service.CreateAsync(request, User.GetAccountId());
         return CreatedAtAction(nameof(GetById), new { id = created.ProjectId }, created);
     }
 
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ProjectDto>> Update(int id, [FromBody] ProjectRequest request)
-        => Ok(await _service.UpdateAsync(id, request));
+        => Ok(await _service.UpdateAsync(id, request, User.GetAccountId()));
 
     /// <summary>Delete a project — returns 400 if any task is linked.</summary>
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

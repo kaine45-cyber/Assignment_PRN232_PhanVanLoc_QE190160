@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskTrack.API.Extensions;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 
@@ -35,23 +37,29 @@ public class TasksController : ControllerBase
         => Ok(await _service.SearchAsync(title, status, priority, projectId, tagId));
 
     /// <summary>Create a task (optional TagIds array).</summary>
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPost]
     public async Task<ActionResult<TaskDto>> Create([FromBody] TaskRequest request)
     {
-        var created = await _service.CreateAsync(request);
+        var created = await _service.CreateAsync(request, User.GetAccountId());
         return CreatedAtAction(nameof(GetById), new { id = created.TaskId }, created);
     }
 
     /// <summary>Update a task, replace its tags and set ModifiedDate = now.</summary>
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TaskDto>> Update(int id, [FromBody] TaskRequest request)
-        => Ok(await _service.UpdateAsync(id, request));
+        => Ok(await _service.UpdateAsync(id, request, User.GetAccountId()));
 
     /// <summary>Soft-delete: sets IsActive = false (never hard-deletes).</summary>
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        await _service.SoftDeleteAsync(id);
+        await _service.SoftDeleteAsync(id, User.GetAccountId());
         return NoContent();
     }
 }
