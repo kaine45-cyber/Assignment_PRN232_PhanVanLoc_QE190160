@@ -54,9 +54,52 @@ jobs:
           path: publish
           retention-days: 7
 
+  test:
+    name: Integration tests (PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tasktrack_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=tasktrack_test;Username=postgres;Password=postgres
+      JWT_SECRET: ci-only-integration-test-secret-0123456789-abcdefghijklmnopqrstuvwxyz
+      PGPASSWORD: postgres
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Create schema, seed data and run migrations
+        run: |
+          psql -h localhost -U postgres -d tasktrack_test -v ON_ERROR_STOP=1 -q -f database/TaskManagementDB_Postgres.sql
+          for f in database/migrations/*.sql; do
+            echo "Applying $f"
+            psql -h localhost -U postgres -d tasktrack_test -v ON_ERROR_STOP=1 -q -f "$f"
+          done
+
+      - name: Test
+        run: dotnet test TaskTrack.Tests/TaskTrack.Tests.csproj --configuration Release --logger GitHubActions --logger "console;verbosity=normal"
+
   docker:
     name: Docker image
-    needs: build
+    needs: [build, test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -87,7 +130,7 @@ jobs:
 
   deploy:
     name: Deploy to Render
-    needs: [build, docker]
+    needs: [build, test, docker]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
